@@ -1,5 +1,4 @@
-const path = require('path');
-
+// next.config.js
 module.exports = {
   env: {
     NEXT_PUBLIC_FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -13,7 +12,7 @@ module.exports = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    domains: ['example.com'], // Replace with your allowed image domains
+    domains: ['example.com'],
     deviceSizes: [320, 420, 768, 1024, 1200],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384, 512],
   },
@@ -24,4 +23,9 @@ module.exports = {
     config.resolve.alias['@'] = path.resolve(__dirname, 'src');
     return config;
   },
+  // Remove the i18n configuration
+  // i18n: {
+  //   locales: ['en', 'fr'],
+  //   defaultLocale: 'en',
+  // },
 };
