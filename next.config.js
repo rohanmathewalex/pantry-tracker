@@ -1,4 +1,6 @@
 // next.config.js
+const path = require('path');
+
 module.exports = {
   env: {
     NEXT_PUBLIC_FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -19,13 +21,9 @@ module.exports = {
   typescript: {
     ignoreBuildErrors: false,
   },
-  webpack: (config, { dev, isServer }) => {
+  webpack: (config) => {
     config.resolve.alias['@'] = path.resolve(__dirname, 'src');
     return config;
   },
   // Remove the i18n configuration
-  // i18n: {
-  //   locales: ['en', 'fr'],
-  //   defaultLocale: 'en',
-  // },
 };
