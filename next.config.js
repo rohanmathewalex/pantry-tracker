@@ -1,7 +1,5 @@
 const path = require('path');
 
-const isExport = process.env.NEXT_PUBLIC_IS_EXPORT === 'true';
-
 module.exports = {
   env: {
     NEXT_PUBLIC_FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -26,10 +24,8 @@ module.exports = {
     config.resolve.alias['@'] = path.resolve(__dirname, 'src');
     return config;
   },
-  ...(isExport ? {} : {
-    i18n: {
-      locales: ['en', 'fr'],
-      defaultLocale: 'en',
-    },
-  }),
+  i18n: {
+    locales: ['en', 'fr'],
+    defaultLocale: 'en',
+  },
 };
