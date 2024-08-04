@@ -1,8 +1,7 @@
 // src/pages/api/recommend-recipes.js
 import { OpenAI } from 'openai';
 
-// Initialize OpenAI API with a supported model
-// // apiKey: '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',
+ 
 const openai = new OpenAI({
   
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
