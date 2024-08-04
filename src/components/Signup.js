@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, TextField, Box, Typography, Paper, Container, Alert } from '@mui/material';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../firebase/firebase'; // Ensure correct path to firebase.js
 import { useRouter } from 'next/router'; // Import useRouter for navigation
 
@@ -14,7 +14,7 @@ const Signup = () => {
     e.preventDefault();
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      // Redirect to login page or a welcome page upon successful signup
+      // Redirect to login page upon successful signup
       router.push('/login'); // Adjust to the path you want to redirect to
     } catch (error) {
       setError('Error signing up: ' + error.message); // Display error message
@@ -22,10 +22,24 @@ const Signup = () => {
     }
   };
 
+  const handleGoogleSignUp = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      // Redirect to a different page if needed
+      router.push('/home'); // Adjust to the path you want to redirect to
+    } catch (error) {
+      setError('Error signing up with Google: ' + error.message); // Display error message
+      console.error('Google signup error:', error);
+    }
+  };
+
   return (
-    <Container component="main" maxWidth="xs">
-      <Paper elevation={3} sx={{ padding: 4, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <Typography variant="h5" component="h1">Sign Up</Typography>
+    <Container component="main" maxWidth="xs" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <Paper elevation={3} sx={{ padding: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+        <Typography variant="h5" component="h1" gutterBottom>
+          Sign Up
+        </Typography>
         <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 2 }}>
           {/* Email Input */}
           <TextField
@@ -65,6 +79,16 @@ const Signup = () => {
           >
             Sign Up
           </Button>
+          {/* Google Sign Up Button */}
+          <Button
+            fullWidth
+            variant="outlined"
+            color="secondary"
+            sx={{ mt: 2 }}
+            onClick={handleGoogleSignUp}
+          >
+            Sign Up with Google
+          </Button>
         </Box>
       </Paper>
     </Container>
@@ -72,20 +96,3 @@ const Signup = () => {
 };
 
 export default Signup;
-
-
-
-/**
- * ey Updates:
-Error Handling: Added an Alert component to display error messages in case of a signup failure.
-Form Elements: Included TextField components for email and password input with appropriate labels and types.
-Redirection: Implemented redirection to the /login page after a successful signup using router.push().
-Styling: Utilized Material-UI components for a professional and clean look, including spacing and margin adjustments.
-Explanation:
-Container: Centers the content and limits its width.
-Paper: Adds a card-like background with elevation for a clean, distinguished look.
-Typography: Sets the header style.
-TextField: Used for user input with appropriate labels.
-Button: Styled to be full-width and contained for emphasis.
-Alert: Displays error messages in case of signup failure.
- */
