@@ -2,12 +2,33 @@ import React, { useEffect, useState } from 'react';
 import { ref, set, update, remove, onValue } from 'firebase/database';
 import { database, auth } from '../firebase/firebase';
 import { signOut } from 'firebase/auth';
-import { Container, Typography, Paper, Box, TextField, IconButton, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Modal, Toolbar, AppBar } from '@mui/material';
+import {
+  Container,
+  Typography,
+  Paper,
+  Box,
+  TextField,
+  IconButton,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Modal,
+  Toolbar,
+  AppBar,
+  Tabs,
+  Tab,
+  CircularProgress,
+} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useRouter } from 'next/router';
+import axios from 'axios';
 
 const Dashboard = () => {
   const [items, setItems] = useState([]);
@@ -16,6 +37,9 @@ const Dashboard = () => {
   const [editMode, setEditMode] = useState(false);
   const [currentItemId, setCurrentItemId] = useState('');
   const [newItem, setNewItem] = useState({ name: '', category: '', quantity: '' });
+  const [tabIndex, setTabIndex] = useState(0);
+  const [recipeSuggestions, setRecipeSuggestions] = useState([]);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -78,6 +102,18 @@ const Dashboard = () => {
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleRecipeRecommendation = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post('/api/recommend-recipes', { items });
+      setRecipeSuggestions(response.data.recipes);
+    } catch (error) {
+      console.error('Error fetching recipe suggestions: ', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Container>
       <AppBar position="static">
@@ -92,90 +128,126 @@ const Dashboard = () => {
       </AppBar>
       <Box my={4}>
         <Paper style={{ padding: '16px' }}>
-          <Typography variant="h4" gutterBottom>
-            Pantry Items
-          </Typography>
-          <Box mb={2} display="flex" justifyContent="space-between" alignItems="center">
-            <TextField
-              label="Search"
-              variant="outlined"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search items"
-              fullWidth
-            />
-            <IconButton color="primary" onClick={() => setOpen(true)}>
-              <AddIcon />
-            </IconButton>
+          <Tabs value={tabIndex} onChange={(e, newValue) => setTabIndex(newValue)} variant="fullWidth">
+            <Tab label="Pantry Items" />
+            <Tab label="Recipe Suggestions" />
+          </Tabs>
+          <Box mt={2}>
+            {tabIndex === 0 && (
+              <>
+                <Box mb={2} display="flex" justifyContent="space-between" alignItems="center">
+                  <TextField
+                    label="Search"
+                    variant="outlined"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search items"
+                    fullWidth
+                  />
+                  <IconButton color="primary" onClick={() => setOpen(true)}>
+                    <AddIcon />
+                  </IconButton>
+                </Box>
+                <TableContainer component={Paper}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Name</TableCell>
+                        <TableCell>Category</TableCell>
+                        <TableCell>Quantity</TableCell>
+                        <TableCell>Actions</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {filteredItems.map(item => (
+                        <TableRow key={item.id}>
+                          <TableCell>{item.name}</TableCell>
+                          <TableCell>{item.category}</TableCell>
+                          <TableCell>{item.quantity}</TableCell>
+                          <TableCell>
+                            <IconButton color="primary" onClick={() => handleOpenEditModal(item)}>
+                              <EditIcon />
+                            </IconButton>
+                            <IconButton color="secondary" onClick={() => handleDeleteItem(item.id)}>
+                              <DeleteIcon />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </>
+            )}
+            {tabIndex === 1 && (
+              <Box display="flex" flexDirection="column" alignItems="center">
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleRecipeRecommendation}
+                  style={{ marginBottom: '16px' }}
+                >
+                  Get Recipe Recommendations
+                </Button>
+                {loading ? (
+                  <CircularProgress />
+                ) : (
+                  <Box>
+                    {recipeSuggestions.length > 0 ? (
+                      recipeSuggestions.map((recipe, index) => (
+                        <Paper key={index} style={{ padding: '16px', marginBottom: '8px' }}>
+                          <Typography variant="h6">{recipe.title}</Typography>
+                          <Typography variant="body1">{recipe.description}</Typography>
+                        </Paper>
+                      ))
+                    ) : (
+                      <Typography>No recipes found</Typography>
+                    )}
+                  </Box>
+                )}
+              </Box>
+            )}
           </Box>
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Category</TableCell>
-                  <TableCell>Quantity</TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredItems.map(item => (
-                  <TableRow key={item.id}>
-                    <TableCell>{item.name}</TableCell>
-                    <TableCell>{item.category}</TableCell>
-                    <TableCell>{item.quantity}</TableCell>
-                    <TableCell>
-                      <IconButton color="primary" onClick={() => handleOpenEditModal(item)}>
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton color="secondary" onClick={() => handleDeleteItem(item.id)}>
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
         </Paper>
-        <Modal open={open} onClose={() => setOpen(false)}>
-          <Box style={{ padding: '16px', maxWidth: '400px', margin: 'auto', marginTop: '50px', backgroundColor: 'white' }}>
-            <Typography variant="h6">{editMode ? 'Edit Item' : 'Add New Item'}</Typography>
-            <TextField
-              label="Name"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              value={newItem.name}
-              onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-            />
-            <TextField
-              label="Category"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              value={newItem.category}
-              onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
-            />
-            <TextField
-              label="Quantity"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              value={newItem.quantity}
-              onChange={(e) => setNewItem({ ...newItem, quantity: e.target.value })}
-            />
-            <Box mt={2} display="flex" justifyContent="flex-end">
-              <Button onClick={() => setOpen(false)} variant="contained" color="secondary" style={{ marginRight: '8px' }}>
-                Cancel
-              </Button>
-              <Button onClick={editMode ? handleEditItem : handleAddItem} variant="contained" color="primary">
-                {editMode ? 'Update Item' : 'Add Item'}
-              </Button>
-            </Box>
-          </Box>
-        </Modal>
       </Box>
+      <Modal open={open} onClose={() => setOpen(false)}>
+        <Paper style={{ padding: '16px', margin: 'auto', maxWidth: '500px', marginTop: '100px' }}>
+          <Typography variant="h6">{editMode ? 'Edit Item' : 'Add Item'}</Typography>
+          <TextField
+            label="Name"
+            variant="outlined"
+            value={newItem.name}
+            onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Category"
+            variant="outlined"
+            value={newItem.category}
+            onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Quantity"
+            variant="outlined"
+            value={newItem.quantity}
+            onChange={(e) => setNewItem({ ...newItem, quantity: e.target.value })}
+            fullWidth
+            margin="normal"
+          />
+          <Box mt={2}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={editMode ? handleEditItem : handleAddItem}
+            >
+              {editMode ? 'Update Item' : 'Add Item'}
+            </Button>
+          </Box>
+        </Paper>
+      </Modal>
     </Container>
   );
 };

@@ -1,0 +1,64 @@
+/* src/styles/Home.module.css */
+ 
+  
+  .container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    background-color: #f0f4f8; /* Light grey-blue background */
+    padding: 0;
+  }
+  
+  .content {
+    text-align: center;
+    background-color: #ffffff; /* White background for the content area */
+    padding: 40px;
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
+    width: 90%;
+    max-width: 600px; /* Max width for better readability */
+    margin: 20px;
+  }
+  
+  .title {
+    font-size: 2.5rem; /* Larger font size for prominence */
+    color: #1e3a8a; /* Deep blue for a professional look */
+    margin-bottom: 20px;
+    font-weight: bold;
+  }
+  
+  .description {
+    font-size: 1.2rem; /* Slightly larger font size for description */
+    color: #374151; /* Dark grey for good contrast */
+    margin-bottom: 30px;
+  }
+  
+  .button {
+    padding: 12px 24px;
+    font-size: 1.1rem;
+    color: #fff;
+    background-color: #2563eb; /* Bright blue for the button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .button:hover {
+    background-color: #1d4ed8; /* Slightly darker blue on hover */
+  }
+  
+  .footer {
+    background-color: #2563eb; /* Blue background for the footer */
+    color: #fff; /* White text color */
+    text-align: center;
+    padding: 20px;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  }
+  

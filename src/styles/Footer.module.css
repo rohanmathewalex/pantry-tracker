@@ -1,0 +1,28 @@
+/* src/styles/Footer.module.css */
+/* src/styles/Footer.module.css */
+.footer {
+    background-color: #00796b; /* Match the theme color */
+    color: #ffffff;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+  }
+  
+  
+  .links {
+    margin-top: 10px;
+  }
+  
+  .links a {
+    margin: 0 10px;
+    text-decoration: none;
+    color: #0070f3; /* Link color */
+  }
+  
+  .links a:hover {
+    text-decoration: underline;
+  }
+  
