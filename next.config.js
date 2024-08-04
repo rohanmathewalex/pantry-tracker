@@ -24,8 +24,4 @@ module.exports = {
     config.resolve.alias['@'] = path.resolve(__dirname, 'src');
     return config;
   },
-  i18n: {
-    locales: ['en', 'fr'],
-    defaultLocale: 'en',
-  },
 };
